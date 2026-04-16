@@ -30,6 +30,7 @@
 </div>
 
 <script>
+// GET USER
 let user = localStorage.getItem("user");
 
 if (!user) {
@@ -37,55 +38,83 @@ if (!user) {
     window.location.href = "index.html";
 }
 
+// HELPERS
+function getUsers() {
+    return JSON.parse(localStorage.getItem("users")) || {};
+}
+
+function saveUsers(users) {
+    localStorage.setItem("users", JSON.stringify(users));
+}
+
 function resetView() {
     document.getElementById("sendBox").style.display = "none";
     document.getElementById("output").innerHTML = "";
 }
 
-async function checkBalance() {
+// 💰 CHECK BALANCE
+function checkBalance() {
     resetView();
-    let res = await fetch(`/balance/${user}`);
-    let data = await res.json();
-    document.getElementById("output").innerHTML = "₹" + data.balance;
+    let users = getUsers();
+
+    document.getElementById("output").innerHTML =
+        "₹" + (users[user]?.balance || 0);
 }
 
+// 💸 SHOW SEND
 function showSend() {
     resetView();
     document.getElementById("sendBox").style.display = "block";
 }
 
-async function sendMoney() {
-    let data = {
-        sender: user,
-        receiver: document.getElementById("receiver").value,
-        bank: document.getElementById("bankSend").value,
-        amount: Number(document.getElementById("amount").value),
-        purpose: document.getElementById("purpose").value
-    };
+// 💸 SEND MONEY
+function sendMoney() {
+    let users = getUsers();
 
-    let res = await fetch("/transfer", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(data)
-    });
+    let receiver = document.getElementById("receiver").value;
+    let amount = Number(document.getElementById("amount").value);
+    let purpose = document.getElementById("purpose").value;
 
-    let result = await res.json();
-    alert(result.balance ? "Transfer Successful" : result.message);
+    if (!receiver || !amount) {
+        alert("Enter details properly");
+        return;
+    }
+
+    if (amount > users[user].balance) {
+        alert("Insufficient balance");
+        return;
+    }
+
+    users[user].balance -= amount;
+
+    users[user].transactions.push(
+        `Sent ₹${amount} to ${receiver} - ${purpose}`
+    );
+
+    saveUsers(users);
+
+    alert("Transfer Successful");
+
+    resetView();
 }
 
-async function viewTransactions() {
+// 📜 TRANSACTIONS
+function viewTransactions() {
     resetView();
-    let res = await fetch(`/transactions/${user}`);
-    let data = await res.json();
+    let users = getUsers();
+
+    let transactions = users[user]?.transactions || [];
 
     document.getElementById("output").innerHTML =
-        data.transactions.length ? data.transactions.join("<br>") : "No transactions";
+        transactions.length ? transactions.join("<br>") : "No transactions";
 }
 
-async function viewProfile() {
+// 👤 PROFILE
+function viewProfile() {
     resetView();
-    let res = await fetch(`/profile/${user}`);
-    let data = await res.json();
+    let users = getUsers();
+
+    let data = users[user];
 
     document.getElementById("output").innerHTML = `
         Name: ${user}<br>

@@ -1,3 +1,4 @@
+// SHOW SIGNUP (KEEP SAME UI BEHAVIOR)
 function showSignup() {
     document.getElementById("extraFields").style.display = "block";
 
@@ -6,47 +7,54 @@ function showSignup() {
     btn.onclick = signup;
 }
 
-async function signup() {
-    let data = {
-        username: document.getElementById("username").value,
-        password: document.getElementById("password").value,
-        email: document.getElementById("email").value,
-        phone: document.getElementById("phone").value,
-        age: document.getElementById("age").value,
-        gender: document.getElementById("gender").value,
-        bank: document.getElementById("bank").value,
-        balance: Number(document.getElementById("initialBalance").value)
-    };
+// SIGNUP (NO BACKEND)
+function signup() {
+    let users = JSON.parse(localStorage.getItem("users")) || {};
 
-    if (!data.username || !data.password) {
+    let username = document.getElementById("username").value;
+    let password = document.getElementById("password").value;
+    let email = document.getElementById("email")?.value || "";
+    let phone = document.getElementById("phone")?.value || "";
+    let age = document.getElementById("age")?.value || "";
+    let gender = document.getElementById("gender")?.value || "";
+    let bank = document.getElementById("bank")?.value || "";
+    let balance = Number(document.getElementById("initialBalance")?.value) || 0;
+
+    if (!username || !password) {
         alert("Enter username & password");
         return;
     }
 
-    let res = await fetch("/signup", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(data)
-    });
+    if (users[username]) {
+        alert("User already exists");
+        return;
+    }
 
-    let result = await res.json();
-    alert(result.message);
+    users[username] = {
+        password,
+        email,
+        phone,
+        age,
+        gender,
+        bank,
+        balance,
+        transactions: [`Account created with ₹${balance}`]
+    };
+
+    localStorage.setItem("users", JSON.stringify(users));
+
+    alert("Account created successfully!");
 }
 
-async function login() {
-    let user = document.getElementById("username").value;
-    let pass = document.getElementById("password").value;
+// LOGIN (NO BACKEND)
+function login() {
+    let users = JSON.parse(localStorage.getItem("users")) || {};
 
-    let res = await fetch("/login", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ username: user, password: pass })
-    });
+    let username = document.getElementById("username").value;
+    let password = document.getElementById("password").value;
 
-    let data = await res.json();
-
-    if (data.username) {
-        localStorage.setItem("user", data.username);
+    if (users[username] && users[username].password === password) {
+        localStorage.setItem("user", username);
         window.location.href = "dashboard.html";
     } else {
         alert("Invalid login");
