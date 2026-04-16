@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+
+        <h1>CloudBus🚀☁️</h1>
+
+        <button onclick="checkBalance()">Check Balance💰</button>
+        <button onclick="showSend()">Send Money💸</button>
+        <button onclick="viewTransactions()">Transactions📜</button>
+        <button onclick="viewProfile()">Profile👤</button>
+
+        <div id="output"></div>
+
+        <div id="sendBox" style="display:none;">
+            <input type="text" id="receiver" placeholder="Receiver Name">
+            <input type="text" id="bankSend" placeholder="Bank Details">
+            <input type="number" id="amount" placeholder="Amount">
+            <input type="text" id="purpose" placeholder="Purpose">
+            <button onclick="sendMoney()">Send</button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+let user = localStorage.getItem("user");
+
+if (!user) {
+    alert("Login first");
+    window.location.href = "index.html";
+}
+
+function resetView() {
+    document.getElementById("sendBox").style.display = "none";
+    document.getElementById("output").innerHTML = "";
+}
+
+async function checkBalance() {
+    resetView();
+    let res = await fetch(`/balance/${user}`);
+    let data = await res.json();
+    document.getElementById("output").innerHTML = "₹" + data.balance;
+}
+
+function showSend() {
+    resetView();
+    document.getElementById("sendBox").style.display = "block";
+}
+
+async function sendMoney() {
+    let data = {
+        sender: user,
+        receiver: document.getElementById("receiver").value,
+        bank: document.getElementById("bankSend").value,
+        amount: Number(document.getElementById("amount").value),
+        purpose: document.getElementById("purpose").value
+    };
+
+    let res = await fetch("/transfer", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(data)
+    });
+
+    let result = await res.json();
+    alert(result.balance ? "Transfer Successful" : result.message);
+}
+
+async function viewTransactions() {
+    resetView();
+    let res = await fetch(`/transactions/${user}`);
+    let data = await res.json();
+
+    document.getElementById("output").innerHTML =
+        data.transactions.length ? data.transactions.join("<br>") : "No transactions";
+}
+
+async function viewProfile() {
+    resetView();
+    let res = await fetch(`/profile/${user}`);
+    let data = await res.json();
+
+    document.getElementById("output").innerHTML = `
+        Name: ${user}<br>
+        Email: ${data.email || "-"}<br>
+        Phone: ${data.phone || "-"}<br>
+        Age: ${data.age || "-"}<br>
+        Gender: ${data.gender || "-"}<br>
+        Bank: ${data.bank || "-"}
+    `;
+}
+</script>
+
+</body>
+</html>

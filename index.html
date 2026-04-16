@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CloudBus🚀☁️</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+
+        <h1>CloudBus🚀☁️</h1>
+        <p>A Bank that's Truly Yours🫶</p>
+        <p>Anytime. Anywhere.</p>
+
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+
+        <!-- EXTRA SIGNUP FIELDS -->
+        <div id="extraFields" style="display:none;">
+            <input type="email" id="email" placeholder="Email">
+            <input type="text" id="phone" placeholder="Phone">
+            <input type="number" id="age" placeholder="Age">
+            <input type="text" id="gender" placeholder="Gender">
+            <input type="text" id="bank" placeholder="Bank Details">
+            <input type="number" id="initialBalance" placeholder="Initial Balance">
+        </div>
+
+        <button onclick="login()">Login</button>
+        <button id="createBtn" onclick="showSignup()" class="secondary">
+            Create Account
+        </button>
+
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
