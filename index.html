@@ -33,7 +33,50 @@
 
     </div>
 </div>
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
 
-<script src="script.js"></script>
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyDUgsMnw5W5lya3TOC2EsFxTmmSG2OvMsQ",
+    authDomain: "cloudbus-project.firebaseapp.com",
+    projectId: "cloudbus-project",
+    storageBucket: "cloudbus-project.firebasestorage.app",
+    messagingSenderId: "104243607380",
+    appId: "1:104243607380:web:44b0d0ef82c97ab5cdfac1"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.2.0/firebase-auth.js";
+
+const auth = getAuth(app);
+
+// CREATE ACCOUNT
+window.createAccount = function () {
+  let email = document.getElementById("username").value;
+  let password = document.getElementById("password").value;
+
+  createUserWithEmailAndPassword(auth, email, password)
+    .then(() => alert("Account created!"))
+    .catch(err => alert(err.message));
+};
+
+// LOGIN
+window.login = function () {
+  let email = document.getElementById("username").value;
+  let password = document.getElementById("password").value;
+
+  signInWithEmailAndPassword(auth, email, password)
+    .then(() => {
+      localStorage.setItem("user", email);
+      window.location.href = "dashboard.html";
+    })
+    .catch(err => alert(err.message));
+};
+</script>
 </body>
 </html>
